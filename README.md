@@ -1,5 +1,7 @@
 # クリスマスツリー2次元パッキング問題 - GA + Bottom-Left戦略
 
+for i in {1..50}; do uv run python main.py --n $i --angle-step 5 --grid-step 0.005 --population 20 --generations 10; done
+
 ## 概要
 
 このプログラムは、複数のクリスマスツリーを正方形のコンテナ内に効率的に配置する2次元パッキング問題を解決するためのソルバーです。遺伝的アルゴリズム（GA）とBottom-Left戦略を組み合わせて、コンテナの面積を最小化する配置を探索します。
