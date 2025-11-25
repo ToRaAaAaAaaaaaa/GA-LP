@@ -417,20 +417,27 @@ class ImprovedGeneticAlgorithm:
     def crossover(self, p1: Individual, p2: Individual) -> Tuple[Individual, Individual]:
         """交叉（順序交叉）"""
         size = self.n_trees
-        point1, point2 = sorted(random.sample(range(size), 2))
-        
+
         o1 = Individual(self.n_trees, self.angle_options)
         o2 = Individual(self.n_trees, self.angle_options)
-        
-        # 順序交叉
-        o1.sequence = self._ordered_crossover(p1.sequence, p2.sequence, point1, point2)
-        o2.sequence = self._ordered_crossover(p2.sequence, p1.sequence, point1, point2)
-        
-        # 角度の一点交叉
-        cross_point = random.randint(1, size - 1)
-        o1.angles = p1.angles[:cross_point] + p2.angles[cross_point:]
-        o2.angles = p2.angles[:cross_point] + p1.angles[cross_point:]
-        
+
+        # サイズが1以下の場合は単純にコピー
+        if size <= 1:
+            o1.sequence = p1.sequence.copy()
+            o2.sequence = p2.sequence.copy()
+            o1.angles = p1.angles.copy()
+            o2.angles = p2.angles.copy()
+        else:
+            # 順序交叉
+            point1, point2 = sorted(random.sample(range(size), 2))
+            o1.sequence = self._ordered_crossover(p1.sequence, p2.sequence, point1, point2)
+            o2.sequence = self._ordered_crossover(p2.sequence, p1.sequence, point1, point2)
+
+            # 角度の一点交叉
+            cross_point = random.randint(1, size - 1)
+            o1.angles = p1.angles[:cross_point] + p2.angles[cross_point:]
+            o2.angles = p2.angles[:cross_point] + p1.angles[cross_point:]
+
         return o1, o2
     
     def _ordered_crossover(self, p1_seq, p2_seq, point1, point2):
@@ -450,10 +457,10 @@ class ImprovedGeneticAlgorithm:
     
     def mutation(self, individual: Individual):
         """突然変異（逆位変異）"""
-        if random.random() < self.mutation_rate:
+        if random.random() < self.mutation_rate and self.n_trees >= 2:
             point1, point2 = sorted(random.sample(range(self.n_trees), 2))
             individual.sequence[point1:point2+1] = list(reversed(individual.sequence[point1:point2+1]))
-        
+
         for i in range(self.n_trees):
             if random.random() < self.mutation_rate:
                 individual.angles[i] = random.choice(self.angle_options)
